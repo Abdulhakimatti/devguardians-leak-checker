@@ -2,10 +2,10 @@
 {% block title %}تسجيل الدخول - DevGuardians{% endblock %}
 {% block content %}
 <div class="mx-auto" style="max-width: 420px;">
-  <h1 class="h3 fw-bold mb-4">دخول المشرف</h1>
+  <h1 class="h3 fw-bold mb-4">دخول المدير</h1>
   {% if disabled %}
     <div class="alert alert-warning">
-      لوحة السجلات معطّلة لأن <code>ADMIN_PASSWORD_HASH</code> غير مضبوط. اتبع خطوات الإعداد في README.
+      صفحة السجلات متوقفة لأنك لم تضع كلمة مرور المدير. اتبع خطوات الإعداد في README.
     </div>
   {% else %}
     <form method="post" class="panel">

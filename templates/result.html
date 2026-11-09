@@ -6,32 +6,32 @@
 {% if kind == "password" %}
   {% if count > 0 %}
     <div class="verdict leak mb-4">
-      <h2 class="h4 fw-bold">كلمة المرور هذه ظهرت في تسريبات</h2>
-      <p class="mb-0">ظهرت <strong>{{ "{:,}".format(count) }}</strong> مرة في بيانات مسرّبة. لا تستخدمها في أي حساب، وغيّرها فورًا إن كنت تستخدمها.</p>
+      <h2 class="h4 fw-bold">كلمة المرور هذه مسرّبة</h2>
+      <p class="mb-0">وُجدت <strong>{{ "{:,}".format(count) }}</strong> مرة في بيانات مسرّبة. لا تستخدمها، وغيّرها فورًا إن كنت تستخدمها.</p>
     </div>
   {% else %}
     <div class="verdict safe mb-4">
-      <h2 class="h4 fw-bold">لم نجد كلمة المرور هذه في التسريبات المعروفة</h2>
-      <p class="mb-0">هذا لا يعني أنها قوية، فقط أنها غير مكشوفة حتى الآن. استخدم كلمة طويلة وفريدة لكل حساب.</p>
+      <h2 class="h4 fw-bold">كلمة المرور هذه غير موجودة في التسريبات</h2>
+      <p class="mb-0">هذا لا يعني أنها قوية، فقط أنها غير مكشوفة حتى الآن. استخدم كلمة طويلة ومختلفة لكل حساب.</p>
     </div>
   {% endif %}
 
-{% else %}
+{% elif kind == "email" %}
   {% if mode == "demo" %}
     <div class="verdict demo mb-4">
-      <strong>وضع تجريبي:</strong> هذه نتيجة عرض وليست فحصًا حقيقيًا، لأن مفتاح HIBP غير مفعّل.
+      <strong>نسخة تجريبية:</strong> هذه نتيجة للتجربة فقط وليست فحصًا حقيقيًا.
     </div>
   {% endif %}
 
-  <p class="text-muted-dg">البريد المفحوص: <span dir="ltr">{{ email }}</span></p>
+  <p class="text-muted-dg">الإيميل: <span dir="ltr">{{ email }}</span></p>
 
   {% if breaches %}
     <div class="verdict leak mb-4">
-      <h2 class="h4 fw-bold">وُجد هذا البريد في {{ breaches|length }} تسريب</h2>
+      <h2 class="h4 fw-bold">إيميلك موجود في {{ breaches|length }} تسريب</h2>
     </div>
     <div class="table-responsive mb-4">
       <table class="table align-middle">
-        <thead><tr><th>التسريب</th><th>تاريخه</th><th>البيانات المكشوفة</th></tr></thead>
+        <thead><tr><th>الموقع</th><th>التاريخ</th><th>ما الذي انكشف</th></tr></thead>
         <tbody>
           {% for b in breaches %}
           <tr>
@@ -45,25 +45,90 @@
     </div>
   {% else %}
     <div class="verdict safe mb-4">
-      <h2 class="h4 fw-bold">لم نجد هذا البريد في تسريبات معروفة</h2>
+      <h2 class="h4 fw-bold">إيميلك غير موجود في التسريبات</h2>
     </div>
   {% endif %}
 
   {% if saved %}
-    <p class="small text-muted-dg">حُفظ هذا الفحص في السجل بصيغة مقنّعة.</p>
+    <p class="small text-muted-dg">تم حفظ هذا الفحص في السجل (الإيميل مخفي جزئيًا).</p>
   {% else %}
-    <p class="small text-muted-dg">لم يُحفظ شيء من هذا الفحص.</p>
+    <p class="small text-muted-dg">لم نحفظ أي شيء من هذا الفحص.</p>
   {% endif %}
+
+{% elif kind == "link" %}
+  <p class="text-muted-dg">الموقع: <span dir="ltr">{{ host }}</span></p>
+  {% if level == "danger" %}
+    <div class="verdict leak mb-4"><h2 class="h4 fw-bold">الرابط خطير على الأرجح</h2>
+      <p class="mb-0">لا تفتحه ولا تكتب عليه أي بيانات.</p></div>
+  {% elif level == "warn" %}
+    <div class="verdict demo mb-4"><h2 class="h4 fw-bold">الرابط مشبوه</h2>
+      <p class="mb-0">كن حذرًا، ولا تكتب بياناتك قبل أن تتأكد من مصدره.</p></div>
+  {% else %}
+    <div class="verdict safe mb-4"><h2 class="h4 fw-bold">لم نجد علامات خطر واضحة</h2>
+      <p class="mb-0">لكن هذا لا يضمن أن الرابط آمن. تأكد أن من أرسله شخص تعرفه.</p></div>
+  {% endif %}
+  {% if reasons %}
+  <section class="panel mb-4"><h2 class="h5 fw-bold">لماذا؟</h2>
+    <ul class="mb-0">{% for r in reasons %}<li>{{ r }}</li>{% endfor %}</ul></section>
+  {% endif %}
+  <p class="small text-muted-dg">فحصنا شكل الرابط فقط، ولم نفتحه.</p>
+
+{% elif kind == "phone" %}
+  <p class="text-muted-dg">الرقم: <span dir="ltr">{{ formatted }}</span></p>
+  {% if valid %}
+    <div class="verdict safe mb-4"><h2 class="h4 fw-bold">الرقم صحيح الشكل</h2></div>
+    <div class="table-responsive mb-4"><table class="table"><tbody>
+      <tr><th>الدولة</th><td>{{ country }}</td></tr>
+      {% if place %}<tr><th>المنطقة</th><td>{{ place }}</td></tr>{% endif %}
+      <tr><th>النوع</th><td>{{ ptype }}</td></tr>
+      {% if carrier %}<tr><th>الشركة</th><td>{{ carrier }}</td></tr>{% endif %}
+    </tbody></table></div>
+    {% if voip %}
+    <div class="verdict demo mb-4">هذا رقم إنترنت (VoIP). يسهل إخفاء صاحبه، ويستخدمه كثير من المحتالين.</div>
+    {% endif %}
+  {% else %}
+    <div class="verdict leak mb-4"><h2 class="h4 fw-bold">الرقم غير صحيح</h2>
+      <p class="mb-0">لا يوجد رقم بهذا الشكل في هذه الدولة. قد يكون وهميًا أو مكتوبًا بخطأ.</p></div>
+  {% endif %}
+  <p class="small text-muted-dg">نعرض مكان تسجيل الرقم وليس مكان صاحبه الآن، ولا نستطيع معرفة هل المتصل محتال.</p>
+
+{% elif kind == "file" %}
+  <p class="text-muted-dg">الملف: <span dir="ltr">{{ filename }}</span> ({{ size_kb }} KB)</p>
+  {% for w in warnings %}<div class="verdict demo mb-3">{{ w }}</div>{% endfor %}
+  {% if vt_status == "found" %}
+    {% set bad = stats.get("malicious", 0) %}
+    {% set sus = stats.get("suspicious", 0) %}
+    {% if bad > 0 %}
+      <div class="verdict leak mb-4"><h2 class="h4 fw-bold">الملف خطير</h2>
+        <p class="mb-0">{{ bad }} برنامج حماية اعتبره خبيثًا. لا تفتحه واحذفه.</p></div>
+    {% elif sus > 0 %}
+      <div class="verdict demo mb-4"><h2 class="h4 fw-bold">الملف مشبوه</h2>
+        <p class="mb-0">{{ sus }} برنامج حماية شكّ فيه. لا تفتحه إلا إذا كنت واثقًا من مصدره.</p></div>
+    {% else %}
+      <div class="verdict safe mb-4"><h2 class="h4 fw-bold">لم يعتبره أي برنامج حماية خبيثًا</h2>
+        <p class="mb-0">هذا مؤشر جيد، لكنه لا يضمن الأمان الكامل.</p></div>
+    {% endif %}
+  {% elif vt_status == "unknown" %}
+    <div class="verdict demo mb-4"><h2 class="h4 fw-bold">الملف غير معروف لدى VirusTotal</h2>
+      <p class="mb-0">لم يفحصه أحد من قبل، وهذا لا يعني أنه آمن ولا أنه خطير.</p></div>
+  {% elif vt_status == "error" %}
+    <div class="verdict demo mb-4">تعذّر فحص الملف الآن. حاول لاحقًا.</div>
+  {% else %}
+    <div class="verdict demo mb-4"><strong>نسخة تجريبية:</strong> لم نبحث عن فيروسات لأن مفتاح VirusTotal غير مفعّل. حسبنا بصمة الملف فقط.</div>
+  {% endif %}
+  <p class="small text-muted-dg mb-1">بصمة الملف (SHA-256):</p>
+  <code dir="ltr" style="word-break: break-all;">{{ sha256 }}</code>
+  <p class="small text-muted-dg mt-3">لم نحفظ الملف. تُستخدم بصمته فقط، وليس الملف نفسه.</p>
 {% endif %}
 
 {% if (kind == "password" and count > 0) or (kind == "email" and breaches) %}
 <section class="panel mb-4">
-  <h2 class="h5 fw-bold">ماذا تفعل الآن</h2>
+  <h2 class="h5 fw-bold">ماذا تفعل الآن؟</h2>
   <ul class="mb-0">
-    <li>غيّر كلمة المرور في الحساب المتأثر، وفي أي حساب تستخدم فيه الكلمة نفسها.</li>
-    <li>فعّل التحقق بخطوتين (2FA) على بريدك وحساباتك المهمة.</li>
-    <li>استخدم مدير كلمات مرور لتوليد كلمة فريدة لكل حساب.</li>
-    <li>انتبه لرسائل التصيّد التي تستغل بياناتك المسرّبة.</li>
+    <li>غيّر كلمة المرور، وغيّرها في أي حساب آخر تستخدم فيه الكلمة نفسها.</li>
+    <li>فعّل التحقق بخطوتين على إيميلك وحساباتك المهمة.</li>
+    <li>استخدم تطبيقًا لحفظ كلمات المرور، ليصنع لك كلمة مختلفة لكل حساب.</li>
+    <li>احذر من الرسائل المزيفة التي تستخدم بياناتك لخداعك.</li>
   </ul>
 </section>
 {% endif %}

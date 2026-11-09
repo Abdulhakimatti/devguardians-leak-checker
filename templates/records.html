@@ -2,12 +2,12 @@
 {% block title %}سجل الفحوصات - DevGuardians{% endblock %}
 {% block content %}
 <h1 class="h3 fw-bold mb-2">سجل الفحوصات</h1>
-<p class="text-muted-dg">آخر 200 فحص وافق أصحابها على حفظه. البريد الإلكتروني مقنّع.</p>
+<p class="text-muted-dg">آخر 200 فحص وافق أصحابه على حفظه. الإيميل مخفي جزئيًا.</p>
 
 {% if records %}
 <div class="table-responsive">
   <table class="table align-middle">
-    <thead><tr><th>#</th><th>البريد</th><th>الحالة</th><th>عدد التسريبات</th><th>الوضع</th><th>الوقت (UTC)</th></tr></thead>
+    <thead><tr><th>#</th><th>الإيميل</th><th>الحالة</th><th>عدد التسريبات</th><th>النوع</th><th>الوقت (UTC)</th></tr></thead>
     <tbody>
       {% for r in records %}
       <tr>
@@ -23,6 +23,6 @@
   </table>
 </div>
 {% else %}
-<div class="panel">لا توجد سجلات بعد. ستظهر هنا الفحوصات التي يحفظها المستخدمون بموافقتهم.</div>
+<div class="panel">لا توجد فحوصات محفوظة بعد. ستظهر هنا الفحوصات التي يوافق المستخدمون على حفظها.</div>
 {% endif %}
 {% endblock %}

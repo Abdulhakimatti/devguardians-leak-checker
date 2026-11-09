@@ -10,12 +10,13 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
   <style>
     :root {
-      --dg-base: #101b2b;
-      --dg-surface: #17263b;
-      --dg-line: #2a3d57;
-      --dg-text: #e6ecf4;
-      --dg-muted: #93a3b8;
+      --dg-base: #1a1230;
+      --dg-surface: #251a42;
+      --dg-line: #3d2d63;
+      --dg-text: #efeaf9;
+      --dg-muted: #ab9fc9;
       --dg-safe: #4cc3b5;
+      --dg-accent: #a78bfa;
       --dg-warn: #f0b94d;
       --dg-danger: #e5584f;
     }
@@ -43,18 +44,18 @@
     .form-control:focus {
       background: var(--dg-base);
       color: var(--dg-text);
-      border-color: var(--dg-safe);
-      box-shadow: 0 0 0 .2rem rgba(76, 195, 181, .25);
+      border-color: var(--dg-accent);
+      box-shadow: 0 0 0 .2rem rgba(167, 139, 250, .3);
     }
-    .btn-dg { background: var(--dg-safe); color: #08201d; font-weight: 700; border: 0; }
-    .btn-dg:hover, .btn-dg:focus-visible { background: #6fd6ca; color: #08201d; }
+    .btn-dg { background: var(--dg-accent); color: #170a35; font-weight: 700; border: 0; }
+    .btn-dg:hover, .btn-dg:focus-visible { background: #c0abff; color: #170a35; }
     .verdict { border-radius: 10px; padding: 1.5rem; border: 1px solid; }
     .verdict.safe { border-color: var(--dg-safe); background: rgba(76,195,181,.08); }
     .verdict.leak { border-color: var(--dg-danger); background: rgba(229,88,79,.09); }
     .verdict.demo { border-color: var(--dg-warn); background: rgba(240,185,77,.08); }
     .table { --bs-table-bg: transparent; --bs-table-color: var(--dg-text); --bs-table-border-color: var(--dg-line); }
     footer { color: var(--dg-muted); font-size: .85rem; }
-    a { color: var(--dg-safe); }
+    a { color: var(--dg-accent); }
   </style>
 </head>
 <body>

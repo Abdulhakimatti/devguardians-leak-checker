@@ -11,3 +11,4 @@ requests==2.34.2
 urllib3==2.8.0
 Werkzeug==3.1.9
 python-dotenv>=1.0
+phonenumbers>=8.13
