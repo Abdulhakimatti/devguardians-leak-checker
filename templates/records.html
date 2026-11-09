@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}سجل الفحوصات - DevGuardians{% endblock %}
+{% block content %}
+<h1 class="h3 fw-bold mb-2">سجل الفحوصات</h1>
+<p class="text-muted-dg">آخر 200 فحص وافق أصحابها على حفظه. البريد الإلكتروني مقنّع.</p>
+
+{% if records %}
+<div class="table-responsive">
+  <table class="table align-middle">
+    <thead><tr><th>#</th><th>البريد</th><th>الحالة</th><th>عدد التسريبات</th><th>الوضع</th><th>الوقت (UTC)</th></tr></thead>
+    <tbody>
+      {% for r in records %}
+      <tr>
+        <td>{{ r["id"] }}</td>
+        <td dir="ltr">{{ r["masked_email"] }}</td>
+        <td>{% if r["is_leaked"] %}<span style="color: var(--dg-danger);">مسرّب</span>{% else %}<span style="color: var(--dg-safe);">سليم</span>{% endif %}</td>
+        <td>{{ r["breach_count"] }}</td>
+        <td>{{ "حقيقي" if r["mode"] == "live" else "تجريبي" }}</td>
+        <td dir="ltr">{{ r["created_at"] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="panel">لا توجد سجلات بعد. ستظهر هنا الفحوصات التي يحفظها المستخدمون بموافقتهم.</div>
+{% endif %}
+{% endblock %}

@@ -1,53 +1,72 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevGuardians | سجل قاعدة البيانات</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-    <style>
-        body { background-color: #0f172a; color: #f8fafc; font-family: system-ui, sans-serif; }
-        .table-card { background: #1e293b; border: 1px solid #334155; border-radius: 16px; }
-    </style>
-</head>
-<body>
-    <div class="container py-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h1 class="fw-bold text-info">🗄️ قاعدة بيانات النظام (SQLite)</h1>
-                <p class="text-secondary mb-0">سجل البريد الإلكتروني المفحوصة والمحفوظة في قاعدة البيانات</p>
-            </div>
-            <a href="/" class="btn btn-outline-light">العودة للرئيسية 🏠</a>
-        </div>
+{% extends "base.html" %}
+{% block title %}نتيجة الفحص - DevGuardians{% endblock %}
+{% block content %}
+<h1 class="h3 fw-bold mb-4">نتيجة الفحص</h1>
 
-        <div class="table-card p-4 shadow-lg">
-            <div class="table-responsive">
-                <table class="table table-dark table-hover align-middle mb-0">
-                    <thead>
-                        <tr>
-                            <th># ID</th>
-                            <th>البريد الإلكتروني</th>
-                            <th>حالة الأمان</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for row in records %}
-                        <tr>
-                            <td>{{ row[0] }}</td>
-                            <td class="fw-bold">{{ row[1] }}</td>
-                            <td>
-                                {% if row[2] == 1 %}
-                                    <span class="badge bg-danger">مسرب (Leaked) ⚠️</span>
-                                {% else %}
-                                    <span class="badge bg-success">آمن (Secure) ✅</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+{% if kind == "password" %}
+  {% if count > 0 %}
+    <div class="verdict leak mb-4">
+      <h2 class="h4 fw-bold">كلمة المرور هذه ظهرت في تسريبات</h2>
+      <p class="mb-0">ظهرت <strong>{{ "{:,}".format(count) }}</strong> مرة في بيانات مسرّبة. لا تستخدمها في أي حساب، وغيّرها فورًا إن كنت تستخدمها.</p>
     </div>
-</body>
-</html>
+  {% else %}
+    <div class="verdict safe mb-4">
+      <h2 class="h4 fw-bold">لم نجد كلمة المرور هذه في التسريبات المعروفة</h2>
+      <p class="mb-0">هذا لا يعني أنها قوية، فقط أنها غير مكشوفة حتى الآن. استخدم كلمة طويلة وفريدة لكل حساب.</p>
+    </div>
+  {% endif %}
+
+{% else %}
+  {% if mode == "demo" %}
+    <div class="verdict demo mb-4">
+      <strong>وضع تجريبي:</strong> هذه نتيجة عرض وليست فحصًا حقيقيًا، لأن مفتاح HIBP غير مفعّل.
+    </div>
+  {% endif %}
+
+  <p class="text-muted-dg">البريد المفحوص: <span dir="ltr">{{ email }}</span></p>
+
+  {% if breaches %}
+    <div class="verdict leak mb-4">
+      <h2 class="h4 fw-bold">وُجد هذا البريد في {{ breaches|length }} تسريب</h2>
+    </div>
+    <div class="table-responsive mb-4">
+      <table class="table align-middle">
+        <thead><tr><th>التسريب</th><th>تاريخه</th><th>البيانات المكشوفة</th></tr></thead>
+        <tbody>
+          {% for b in breaches %}
+          <tr>
+            <td>{{ b.get("Title") or b.get("Name") }}</td>
+            <td dir="ltr">{{ b.get("BreachDate", "") }}</td>
+            <td dir="ltr">{{ (b.get("DataClasses") or [])|join(", ") }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="verdict safe mb-4">
+      <h2 class="h4 fw-bold">لم نجد هذا البريد في تسريبات معروفة</h2>
+    </div>
+  {% endif %}
+
+  {% if saved %}
+    <p class="small text-muted-dg">حُفظ هذا الفحص في السجل بصيغة مقنّعة.</p>
+  {% else %}
+    <p class="small text-muted-dg">لم يُحفظ شيء من هذا الفحص.</p>
+  {% endif %}
+{% endif %}
+
+{% if (kind == "password" and count > 0) or (kind == "email" and breaches) %}
+<section class="panel mb-4">
+  <h2 class="h5 fw-bold">ماذا تفعل الآن</h2>
+  <ul class="mb-0">
+    <li>غيّر كلمة المرور في الحساب المتأثر، وفي أي حساب تستخدم فيه الكلمة نفسها.</li>
+    <li>فعّل التحقق بخطوتين (2FA) على بريدك وحساباتك المهمة.</li>
+    <li>استخدم مدير كلمات مرور لتوليد كلمة فريدة لكل حساب.</li>
+    <li>انتبه لرسائل التصيّد التي تستغل بياناتك المسرّبة.</li>
+  </ul>
+</section>
+{% endif %}
+
+<a class="btn btn-dg" href="{{ url_for('home') }}">فحص جديد</a>
+{% endblock %}

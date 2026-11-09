@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}DevGuardians{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --dg-base: #101b2b;
+      --dg-surface: #17263b;
+      --dg-line: #2a3d57;
+      --dg-text: #e6ecf4;
+      --dg-muted: #93a3b8;
+      --dg-safe: #4cc3b5;
+      --dg-warn: #f0b94d;
+      --dg-danger: #e5584f;
+    }
+    body {
+      background: var(--dg-base);
+      color: var(--dg-text);
+      font-family: "IBM Plex Sans Arabic", system-ui, sans-serif;
+      min-height: 100vh;
+    }
+    .navbar { background: var(--dg-surface); border-bottom: 1px solid var(--dg-line); }
+    .navbar-brand { font-weight: 700; color: var(--dg-text); }
+    .panel {
+      background: var(--dg-surface);
+      border: 1px solid var(--dg-line);
+      border-radius: 10px;
+      padding: 1.5rem;
+      height: 100%;
+    }
+    .text-muted-dg { color: var(--dg-muted); }
+    .form-control {
+      background: var(--dg-base);
+      border-color: var(--dg-line);
+      color: var(--dg-text);
+    }
+    .form-control:focus {
+      background: var(--dg-base);
+      color: var(--dg-text);
+      border-color: var(--dg-safe);
+      box-shadow: 0 0 0 .2rem rgba(76, 195, 181, .25);
+    }
+    .btn-dg { background: var(--dg-safe); color: #08201d; font-weight: 700; border: 0; }
+    .btn-dg:hover, .btn-dg:focus-visible { background: #6fd6ca; color: #08201d; }
+    .verdict { border-radius: 10px; padding: 1.5rem; border: 1px solid; }
+    .verdict.safe { border-color: var(--dg-safe); background: rgba(76,195,181,.08); }
+    .verdict.leak { border-color: var(--dg-danger); background: rgba(229,88,79,.09); }
+    .verdict.demo { border-color: var(--dg-warn); background: rgba(240,185,77,.08); }
+    .table { --bs-table-bg: transparent; --bs-table-color: var(--dg-text); --bs-table-border-color: var(--dg-line); }
+    footer { color: var(--dg-muted); font-size: .85rem; }
+    a { color: var(--dg-safe); }
+  </style>
+</head>
+<body>
+  <nav class="navbar mb-4">
+    <div class="container d-flex justify-content-between">
+      <a class="navbar-brand" href="{{ url_for('home') }}">🛡️ DevGuardians</a>
+      {% if session.get('is_admin') %}
+        <div class="d-flex gap-2 align-items-center">
+          <a href="{{ url_for('view_records') }}">السجلات</a>
+          <form method="post" action="{{ url_for('logout') }}" class="m-0">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-sm btn-outline-secondary">تسجيل الخروج</button>
+          </form>
+        </div>
+      {% endif %}
+    </div>
+  </nav>
+
+  <main class="container" style="max-width: 960px;">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="container text-center py-5" style="max-width: 960px;">
+    مشروع تخرج - فريق حراس التطوير (DevGuardians) - الكلية التقنية
+  </footer>
+</body>
+</html>

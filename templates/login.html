@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}تسجيل الدخول - DevGuardians{% endblock %}
+{% block content %}
+<div class="mx-auto" style="max-width: 420px;">
+  <h1 class="h3 fw-bold mb-4">دخول المشرف</h1>
+  {% if disabled %}
+    <div class="alert alert-warning">
+      لوحة السجلات معطّلة لأن <code>ADMIN_PASSWORD_HASH</code> غير مضبوط. اتبع خطوات الإعداد في README.
+    </div>
+  {% else %}
+    <form method="post" class="panel">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label for="password" class="form-label">كلمة المرور</label>
+      <input id="password" name="password" type="password" class="form-control mb-3" required>
+      <button class="btn btn-dg w-100">دخول</button>
+    </form>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,61 +1,46 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevGuardians | منصة فحص التسريبات</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-    <style>
-        body { background-color: #0f172a; color: #f8fafc; font-family: system-ui, sans-serif; }
-        .hero-card { background: #1e293b; border: 1px solid #334155; border-radius: 16px; }
-        .btn-check-leak { background-color: #0284c7; border: none; }
-        .btn-check-leak:hover { background-color: #0369a1; }
-    </style>
-</head>
-<body>
-    <div class="container py-5">
-        <div class="text-center mb-5">
-            <h1 class="fw-bold text-info mb-2">🛡️ حراس التطوير (DevGuardians)</h1>
-            <p class="text-secondary fs-5">منصة فحص تسريب البيانات وإرشادات الأمان الرقمي</p>
-        </div>
+{% extends "base.html" %}
+{% block title %}هل تسرّبت بياناتك؟ - DevGuardians{% endblock %}
+{% block content %}
+<h1 class="h2 fw-bold mb-2">هل تسرّبت بياناتك؟</h1>
+<p class="text-muted-dg mb-4">افحص كلمة مرورك أو بريدك الإلكتروني مقابل تسريبات معروفة، واعرف ما تفعله بعد ذلك.</p>
 
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="hero-card p-4 p-md-5 shadow-lg">
-                    <h3 class="mb-3 text-center">افحص أمان بريدك الإلكتروني</h3>
-                    <form action="/check" method="POST" class="mt-4">
-                        <div class="input-group input-group-lg mb-3">
-                            <input type="email" name="email" class="form-control text-end" placeholder="ادخل البريد الإلكتروني هنا..." required>
-                            <button class="btn btn-primary btn-check-leak px-4" type="submit">فحص الآن 🔍</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+<div class="row g-4">
+  <div class="col-md-6">
+    <section class="panel">
+      <h2 class="h5 fw-bold">فحص كلمة المرور</h2>
+      <p class="text-muted-dg small">كلمة مرورك لا تغادر الخادم ولا تُخزَّن. يُرسَل جزء قصير فقط من بصمتها المشفّرة (SHA-1) إلى خدمة Pwned Passwords.</p>
+      <form method="post" action="{{ url_for('check_password') }}" autocomplete="off">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label for="password" class="form-label">كلمة المرور</label>
+        <input id="password" name="password" type="password" class="form-control mb-3"
+               maxlength="256" required autocomplete="off">
+        <button class="btn btn-dg w-100">افحص كلمة المرور</button>
+      </form>
+    </section>
+  </div>
 
-        <div class="row mt-5 g-4">
-            <div class="col-md-4">
-                <div class="hero-card p-4 h-100">
-                    <h5>🔒 التشفير القوي</h5>
-                    <p class="text-secondary small">تأكد من استخدام كلمات مرور معقدة لا تقل عن 12 خانة تحتوي على أرقام ورموز.</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="hero-card p-4 h-100">
-                    <h5>🔑 التحقق الثنائي (2FA)</h5>
-                    <p class="text-secondary small">فعّل التحقق بخطوتين عبر تطبيقات Authenticator للحماية من سرقة الحسابات.</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="hero-card p-4 h-100">
-                    <h5>⚠️ التوعية والتصيد</h5>
-                    <p class="text-secondary small">احذر من فتح الروبط غير الموثوقة أو تحميل المرفقات من مصادر مجهولة.</p>
-                </div>
-            </div>
+  <div class="col-md-6">
+    <section class="panel">
+      <h2 class="h5 fw-bold">فحص البريد الإلكتروني</h2>
+      {% if live %}
+        <p class="text-muted-dg small">يُفحص بريدك مقابل قاعدة بيانات Have I Been Pwned.</p>
+      {% else %}
+        <p class="small" style="color: var(--dg-warn);">الوضع التجريبي: لا يوجد مفتاح HIBP، والنتائج هنا بيانات عرض وليست نتائج حقيقية.</p>
+      {% endif %}
+      <form method="post" action="{{ url_for('check_email') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label for="email" class="form-label">البريد الإلكتروني</label>
+        <input id="email" name="email" type="email" class="form-control mb-3"
+               maxlength="254" required dir="ltr" placeholder="name@example.com">
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" name="save_history" id="save_history">
+          <label class="form-check-label small" for="save_history">
+            احفظ هذا الفحص في السجل (يُحفظ البريد مقنّعًا مثل ab***@gmail.com)
+          </label>
         </div>
-             <div class="text-center mt-4">
-          <a href="/records" class="text-info text-decoration-none">📋 عرض سجلات قاعدة البيانات (خاص بلجنة المناقشة)</a>
-       </div>
-    </div>
-</body>
-</html>
+        <button class="btn btn-dg w-100">افحص البريد</button>
+      </form>
+    </section>
+  </div>
+</div>
+{% endblock %}
